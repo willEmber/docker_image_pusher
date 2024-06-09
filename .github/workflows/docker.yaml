@@ -26,13 +26,13 @@ jobs:
 
     - name: Build and push image Aliyun
       run: |
-        docker login -u $ALIYUN_REGISTRY_USER -p $ALIYUN_REGISTRY_PASSWORD $ALIYUN_REGISTRY
-        for line in $(cat images.txt); do
-          docker pull $line
-          image_name_tag=$(echo $line | awk -F'/' '{print $NF}')
+        # 通过标准输入使用密码（更安全）
+        echo "$ALIYUN_REGISTRY_PASSWORD" | docker login -u "$ALIYUN_REGISTRY_USER" --password-stdin "$ALIYUN_REGISTRY"
+        while read line; do
+          docker pull "$line" || { echo "拉取镜像出错: $line"; exit 1; } # 如果拉取失败则退出
+          image_name_tag=$(echo "$line" | awk -F'/' '{print $NF}')
           new_image="$ALIYUN_REGISTRY/$ALIYUN_NAME_SPACE/$image_name_tag"
-          echo "docker tag $image $new_image"
-          docker tag $line $new_image
-          echo "docker push $new_image"
-          docker push $new_image
-        done
+          docker tag "$line" "$new_image" || { echo "标记镜像出错: $line"; exit 1; }
+          echo "正在推送 $new_image"
+          docker push "$new_image" || { echo "推送镜像出错: $new_image"; exit 1; }
+        done < images.txt
