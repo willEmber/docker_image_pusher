@@ -1,4 +1,4 @@
 prom/prometheus
 grafana/grafana
 prom/alertmanager
-prom/pushgateway
+prom/pushgateway:latest
