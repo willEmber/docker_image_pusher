@@ -3,3 +3,4 @@ grafana/grafana
 prom/alertmanager
 prom/pushgateway:latest
 cloudreve/cloudreve:latest
+yidadaa/chatgpt-next-web:latest
